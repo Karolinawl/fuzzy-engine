@@ -28,54 +28,50 @@ import pandas as pd
 import plotly.express as px
 
 df = pd.read_csv('fuzzy-engine/data/etsy_shops_data.csv')
-# Analysis and visualization follow
-```
+## .github/copilot-instructions.md — Fuzzy Engine (concise)
 
-### External API Integration (Etsy API v3)
-- **File**: `assets/etsy_api_test.py`
-- **Endpoint**: `https://openapi.etsy.com/v3/application/listings/active`
-- **Auth**: `x-api-key` header (client_key stored locally, never commit)
-- **Parameters**: Support `keywords`, `limit` for filtering
-- **Status**: Experimental - for testing API connectivity only
+Purpose: Help an AI coding assistant be immediately productive in this repository by describing the project shape, key files, conventions, and safe workflows.
 
-### Python Environment
-- Uses `.venv/` virtual environment (in .gitignore)
-- No requirements.txt yet - infer dependencies from imports: pandas, requests, numpy, plotly
-- Dependencies are installed in `.venv/` but not tracked in repo
+1) Quick summary
+- This is a data-analytics repository that explores an Etsy shops dataset (CSV-based). Primary work is exploratory analysis, cleaning, and visualization — not a production service.
 
-## Project-Specific Patterns & Conventions
+2) Files and locations to know (examples)
+- Project README: `fuzzy-engine/README.md` (business context, dataset description)
+- Notebooks: `fuzzy-engine/assets/eda_analysis.ipynb` (main EDA work)
+- Raw data: `fuzzy-engine/data/etsy_shops_data.csv`
+- Cleaned data (convention): `fuzzy-engine/data/etsy_shops_data_cleaned.csv`
 
-### File Naming
-- Snake_case for Python scripts (`check_data.py`, `etsy_api_test.py`)
-- All paths relative to project root (e.g., `fuzzy-engine/data/`)
+3) How to get started (developer workflow)
+- Use Python 3.14 in a virtual environment (project commonly uses `.venv/` — do not commit it).
+- Open the EDA notebook in VS Code or Jupyter: `fuzzy-engine/assets/eda_analysis.ipynb` for narrative analysis and plotting.
+- For scripted transforms, read/write CSVs under `fuzzy-engine/data/` using relative paths so runs are portable.
 
-### Data Handling Conventions
-- Always check for `-99` sentinel values indicating missing data in numeric columns
-- Handle `None` values in location fields gracefully (many shops have `None` for `shop_location`)
-- Use pandas `.info()` to inspect data structure before analysis
+4) Project-specific data conventions (important)
+- Sentinel for missing numeric data: `-99` — always check and handle these before numeric ops.
+- Many location fields are messy or NULL; prefer conservative country inference and document assumptions.
+- Typical pattern: call `df.info()` and `df.describe()` early, then drop/replace `-99` and convert boolean-like columns to 0/1.
 
-### Polish/English Mix
-- Code contains Polish characters and comments (e.g., "Wiersze", "Kolumny")
-- Maintain this style when adding to existing files, but prioritize English in new documentation
+5) Typical code patterns and examples
+- Preferred stack for analyses: pandas + NumPy + matplotlib/seaborn/plotly for visuals.
+- Example read pattern:
 
-## Integration Points & External Dependencies
+  - Read: `df = pd.read_csv('fuzzy-engine/data/etsy_shops_data.csv')`
+  - Inspect: `df.info()` / `df.isin([-99]).sum()`
+  - Save cleaned: `df.to_csv('fuzzy-engine/data/etsy_shops_data_cleaned.csv', index=False)`
 
-### Etsy API v3
-- **Purpose**: Real-time listing/shop data collection
-- **Status**: Requires valid API key (not included in repo)
-- **Usage**: Reference `etsy_api_test.py` for request structure
-- **Limitation**: Currently experimental, not integrated into main analysis workflow
+6) Integration & secrets
+- The repo contains no committed API keys. If an API-test script exists locally, treat it as experimental. Never add keys to the repo; use environment variables or local config files listed in `.gitignore`.
 
-### Data Source
-- CSV files are primary data (no database)
-- All new data analyses should source from `data/` directory
-- No streaming or real-time requirements
+7) Language, style, and file conventions
+- File names: snake_case for scripts and clear descriptive names for outputs (use `_cleaned.csv` suffix for cleaned datasets).
+- Comments may include Polish; preserve existing language in-place but prefer English for new public-facing docs.
 
-## AI Agent Guidelines
+8) When an AI agent should ask for human help
+- If a change will alter the canonical dataset in `data/` (e.g., removing columns or re-encoding): ask for confirmation and document the transformation in `README.md` or a short `NOTES.md`.
+- If work depends on an Etsy API key or other credential: request a secure way to test (developer-provided key via env only).
 
-1. **Before modifying data handling**: Check `check_data.py` to understand existing data inspection patterns
-2. **API changes**: If updating Etsy API calls, test with `etsy_api_test.py` first
-3. **New analysis scripts**: Follow the pandas/plotly pattern in existing assets
-4. **Path handling**: Use relative paths from project root (`fuzzy-engine/data/...`) for portability across platforms
-5. **Never commit**: API keys, credentials, or the `.venv/` directory
-6. **Data validation**: Always call `df.info()` and check for `-99` and `None` values when starting new analysis
+9) Helpful pointers to reference in PRs
+- Link to the notebook(s) that demonstrate the workflow (`assets/eda_analysis.ipynb`).
+- Include before/after dataset samples (small CSV diff) when changing cleaning logic.
+
+If anything here is unclear or you want the instructions to emphasize a different workflow (e.g., adding tests or CI), tell me which parts to expand and I will iterate.
